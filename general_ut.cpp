@@ -19,31 +19,49 @@ TEST(MySharedPtr, DefaultCtorValues) {
 }
 
 TEST(MySharedPtr, PointerCtorValues) {
-    my_shared_ptr<int> msp(new int(5));
-    std::shared_ptr<int> sp(new int(5));
-    EXPECT_EQ(sp.use_count(), msp.use_count());
-    EXPECT_EQ(*sp, *msp);
+    std::vector<int*> msp_values = {new int(5), nullptr};
+    std::vector<int*> sp_values = {new int(5), nullptr};
+
+    for (int i = 0; i != msp_values.size(); ++i) {
+        my_shared_ptr<int> msp(msp_values[i]);
+        std::shared_ptr<int> sp(sp_values[i]);
+        EXPECT_EQ(sp.use_count(), msp.use_count());
+
+        // UB see 1st test
+        if (msp_values[i] != nullptr) {
+            EXPECT_EQ(*sp, *msp);
+        }
+    }
 }
 
+// Pass nullptr not casted to int*
 TEST(MySharedPtr, PointerCtorNullptr) {
     my_shared_ptr<int> msp(nullptr);
     std::shared_ptr<int> sp(nullptr);
     EXPECT_EQ(sp.use_count(), msp.use_count());
-    // UB see 1st test
-    // EXPECT_EQ(*sp, *msp);
 }
 
 TEST(MySharedPtr, CopyCtorValues) {
-    my_shared_ptr<int> from_msp(new int(5));
-    my_shared_ptr<int> to_msp(from_msp);
+    std::vector<int*> msp_values = {new int(5), nullptr};
+    std::vector<int*> sp_values = {new int(5), nullptr};
 
-    std::shared_ptr<int> from_sp(new int(5));
-    std::shared_ptr<int> to_sp(from_sp);
+    for (int i = 0; i != msp_values.size(); ++i) {
+        my_shared_ptr<int> from_msp(msp_values[i]);
+        my_shared_ptr<int> to_msp(from_msp);
 
-    EXPECT_EQ(to_sp.use_count(), to_msp.use_count());
-    EXPECT_EQ(*to_sp, *to_msp);
+        std::shared_ptr<int> from_sp(sp_values[i]);
+        std::shared_ptr<int> to_sp(from_sp);
+
+        EXPECT_EQ(to_sp.use_count(), to_msp.use_count());
+
+        // UB see 1st test
+        if (msp_values[i] != nullptr) {
+            EXPECT_EQ(*to_sp, *to_msp);
+        }
+    }
 }
 
+// Test nullptr not casted to int*
 TEST(MySharedPtr, CopyCtorNullptr) {
     my_shared_ptr<int> from_msp(nullptr);
     my_shared_ptr<int> to_msp(from_msp);
@@ -75,16 +93,24 @@ TEST(MySharedPtr, CopyCtorLinksCount) {
 }
 
 TEST(MySharedPtr, CopyAssignmentValues) {
-    my_shared_ptr<int> from_msp(new int(5));
-    my_shared_ptr<int> to_msp = from_msp;
+    std::vector<int*> msp_values = {new int(5), nullptr};
+    std::vector<int*> sp_values = {new int(5), nullptr};
 
-    std::shared_ptr<int> from_sp(new int(5));
-    std::shared_ptr<int> to_sp = from_sp;
+    for (int i = 0; i != msp_values.size(); ++i) {
+        my_shared_ptr<int> from_msp(msp_values[i]);
+        my_shared_ptr<int> to_msp = from_msp;
 
-    EXPECT_EQ(to_sp.use_count(), to_msp.use_count());
-    EXPECT_EQ(*to_sp, *to_msp);
+        std::shared_ptr<int> from_sp(sp_values[i]);
+        std::shared_ptr<int> to_sp = from_sp;
+
+        EXPECT_EQ(to_sp.use_count(), to_msp.use_count());
+        if (msp_values[i] != nullptr) {
+            EXPECT_EQ(*to_sp, *to_msp);
+        }
+    }
 }
 
+// Test nullptr not casted to int*
 TEST(MySharedPtr, CopyAssignmentNullptr) {
     my_shared_ptr<int> from_msp(nullptr);
     my_shared_ptr<int> to_msp = from_msp;

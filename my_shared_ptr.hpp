@@ -12,6 +12,9 @@ public:
     // Default ctor
     constexpr my_shared_ptr() noexcept { }
 
+    // std::shared_ptr<int> a(nullptr); returns 0 as use_count()
+    // -------
+    // std::shared_ptr<int> a(static_cast<int*>(nullptr)); returns 1 as use_count()
     constexpr my_shared_ptr(std::nullptr_t) noexcept { }
 
     // Pointer ctor
@@ -25,12 +28,21 @@ public:
     // "Constructs a shared_ptr which shares ownership of the object managed by r.
     // If r manages no object, *this manages no object too."
     // https://en.cppreference.com/w/cpp/memory/shared_ptr/shared_ptr
+    //
+    // Also nullptr note:
+    // std::shared_ptr<int> a(nullptr);
+    // std::shared_ptr<int> b(a);
+    // b.use_count() is 0;
+    // --------------
+    // std::shared_ptr<int> a(static_cast<int*>(nullptr));
+    // std::shared_ptr<int> b(a);
+    // b.use_count() is 2;
     my_shared_ptr(const my_shared_ptr& other) noexcept
         : ptr(other.ptr)
         , count(other.count) {
 
         // increment number of owners of object
-        if (ptr != nullptr && count != nullptr) {
+        if (count != nullptr) {
             ++(*count);
         }
     }
