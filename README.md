@@ -22,6 +22,28 @@ These methods are standard for shared_ptr.
 2. `cmake --build build`
 3. `cd build && ctest`
 
+## Valgrind:
+To test how the implementation manages the memory you may want
+to use valgrind. Here is the tutorial. We will use valgrind with
+test binary from previous step.
+1. Install valgrind `apt install valgrind` linux only
+2. Run test executable with leaks check: `valgrind --tool=memcheck --leak-check=yes build/unit_tests`
+
+### Results:
+```
+==22058== HEAP SUMMARY:
+==22058==     in use at exit: 0 bytes in 0 blocks
+==22058==   total heap usage: 461 allocs, 461 frees, 134,390 bytes allocated
+==22058==
+==22058== All heap blocks were freed -- no leaks are possible
+==22058==
+==22058== For lists of detected and suppressed errors, rerun with: -s
+==22058== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+```
+
+I also tried to remove `delete` from class and got leaks errors.
+So The test really catches the problems.
+
 ## How to run main.cpp:
 1. `g++ -std=gnu++14 main.cpp`
 2. `./a.out`
