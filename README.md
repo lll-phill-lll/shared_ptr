@@ -22,11 +22,11 @@ These methods are standard for shared_ptr.
 2. `cmake --build build`
 3. `cd build && ctest`
 
-## Valgrind:
+## Memory leaks. Valgrind:
 To test how the implementation manages the memory you may want
 to use valgrind. Here is the tutorial. We will use valgrind with
 test binary from previous step.
-1. Install valgrind `apt install valgrind` linux only
+1. Install valgrind `apt install valgrind` Note: linux only
 2. Run test executable with leaks check: `valgrind --tool=memcheck --leak-check=yes build/unit_tests`
 
 ### Results:
